@@ -38,4 +38,34 @@ SELECT artist_name, track_name, popularity
 FROM BIT_DB.Spotifydata
 ORDER BY popularity desc;
 
-#3. 
+#3. What is the average danceability for the top 10 artists?
+SELECT artist_name, avg(danceability), popularity
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+ORDER BY popularity desc LIMIT 10;
+
+#4. Determine the 15 loudest songs.
+SELECT loudness, track_name, artist_name
+FROM BIT_DB.Spotifydata
+ORDER BY loudness desc LIMIT 15;
+
+#5. What tracks have the least tempo? limit this to 5.
+SELECT tempo, track_name
+FROM BIT_DB.Spotifydata
+ORDER BY tempo asc LIMIT 5;
+
+#6. Which artist has the longest song? and whats the song name?
+SELECT artist_name, track_name, MAX(duration_ms)
+FROM BIT_DB.Spotifydata
+ORDER BY Max(duration_ms) LIMIT 1;
+
+#7. What artists show up more than once on the list? 
+SELECT artist_name, count(*)
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+HAVING count(*)>1;
+
+#8. How many songs feature another artist? 
+SELECT count(track_name)
+FROM BIT_DB.Spotifydata
+WHERE track_name like '%feat.%';
