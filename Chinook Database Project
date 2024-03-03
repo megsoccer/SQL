@@ -120,3 +120,12 @@ ON albums.AlbumId=tracks.AlbumId
 JOIN chinook.genres
 ON tracks.GenreId=genres.GenreId
 WHERE genres.Name = 'Jazz';
+
+16. Categorize the prices of items by 'Low', 'Medium' and 'High'.
+SELECT UnitPrice,
+    CASE 
+        WHEN UnitPrice < 0.1 THEN 'Low'
+        WHEN UnitPrice < 0.5 THEN 'Medium'
+        ELSE 'High'
+    END AS price_category
+FROM chinook.invoice_items;
