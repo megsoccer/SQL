@@ -1,0 +1,121 @@
+#downloaded a database called Chinook with the following information:
+
+#developed and answered the following questions to analyze the data further.
+
+1. Show the total sales made by each sales agent. Order by least to most.
+SELECT emp.FirstName, emp.LastName, ROUND(SUM(invoices.Total),2) as 'Total Sales'
+FROM chinook.employees emp
+JOIN chinook.customers as cust
+ON emp.EmployeeId=cust.SupportRepId
+JOIN chinook.invoices
+ON invoices.CustomerId=cust.CustomerId
+WHERE emp.Title= 'Sales Support Agent'
+GROUP BY emp.FirstName
+ORDER BY 'Total Sales' asc;
+
+2. Find a unique/distinct list of billing countries from the Invoice table.
+SELECT distinct BillingCountry 
+FROM chinook.invoices;
+
+3. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+SELECT tracks.Name as 'Track', media_types.Name as 'Media Type', genres.Name as 'Genre', albums.Title as 'Album'
+FROM chinook.tracks
+JOIN chinook.albums
+ON albums.AlbumId=tracks.AlbumId
+JOIN chinook.genres
+ON genres.GenreId=tracks.GenreId
+JOIN chinook.media_types
+ON media_types.MediaTypeId=tracks.MediaTypeId;
+
+4. How many artists have more than 1 genre? Include artist name and label them as 'Multi Genre'
+SELECT ar.Name AS artist_name,
+    COUNT(DISTINCT g.Name) AS genre_count,
+    'Multi Genre' AS label
+FROM chinook.artists as ar
+JOIN albums as al 
+ON ar.ArtistId = al.ArtistId
+JOIN tracks t 
+ON al.AlbumId = t.AlbumId
+JOIN genres as g 
+ON t.GenreId = g.GenreId
+GROUP BY ar.Name
+HAVING COUNT(DISTINCT g.Name) > 1;
+
+5. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+SELECT invoices.Total, customers.FirstName, customers.Lastname, customers.Country, employees.LastName as 'Sales Agent Last', employees.FirstName as 'Sales Agent First'
+FROM chinook.employees
+JOIN chinook.Customers 
+ON customers.SupportRepId=employees.EmployeeId
+JOIN chinook.invoices 
+ON invoices.CustomerId=Customers.CustomerId;
+
+6. Show customers with their Fullname, customer ID and country, for those who are in the US only.
+SELECT FirstName, LastName, CustomerId, Country
+FROM chinook.customers
+WHERE Country='USA';
+
+7. How many employees have a birthday in November? include their first and last name, and birthdate.
+SELECT FirstName, LastName, Birthdate
+FROM chinook.employees
+WHERE strftime('%m', birthdate)='11';
+
+8. How many artists have only one album?
+SELECT COUNT(*) as num_artists_with_one_album
+FROM (SELECT ArtistId
+FROM chinook.albums
+GROUP BY ArtistId
+HAVING COUNT(AlbumId)=1);
+
+9. What is the most popular music genre? order by most to least.
+SELECT genres.Name, COUNT(*) as num_tracks
+FROM chinook.genres
+JOIN tracks 
+ON tracks.GenreId=genres.GenreId
+GROUP BY genres.Name
+ORDER BY num_tracks desc;
+
+10. Who is the top customer who spent the most? what was the total amount spent?
+SELECT customers.FirstName, customers.LastName, SUM(invoice_items.Quantity*invoice_items.UnitPrice) as 'total spent'
+FROM chinook.invoice_items
+JOIN chinook.customers
+ON customers.CustomerId=invoice_items.InvoiceId
+GROUP BY customers.FirstName;
+
+11. How many tracks are in each playlist?
+SELECT p.PlaylistId, p.name AS playlist_name, COUNT(pt.TrackId) AS num_tracks
+FROM chinook.playlists p
+JOIN chinook.playlist_track pt ON p.PlaylistId = pt.PlaylistId
+GROUP BY p.PlaylistId, p.Name;
+
+12. How many employees were hired between 2006 and 2009?
+SELECT COUNT(*) as Num_employees_hired
+FROM chinook.employees
+WHERE strftime('%Y', HireDate) BETWEEN '2006' AND '2009';
+
+13. Number of Sales Agents in each country. limit to 10.
+SELECT c.country, COUNT(DISTINCT e.EmployeeId) AS num_agents
+FROM chinook.employees as e
+JOIN chinook.customers as c ON e.EmployeeId = c.SupportRepId
+JOIN chinook.invoices as i ON c.CustomerId = i.CustomerId
+JOIN (SELECT DISTINCT CustomerId FROM invoices) inv ON c.CustomerId = inv.CustomerId
+GROUP BY c.country
+ORDER BY num_agents DESC
+LIMIT 10;
+
+14. What type of media is every track? 
+SELECT media_types.Name, tracks.Name
+FROM chinook.media_types
+JOIN chinook.tracks
+ON media_types.MediaTypeId=tracks.MediaTypeId
+GROUP BY tracks.Name;
+
+15. How many artists have tracks that are the music genre Jazz?
+SELECT COUNT(distinct artists.Name) as Num_artists_jazz, genres.Name
+FROM chinook.artists
+JOIN chinook.albums
+ON  artists.ArtistId=albums.AlbumId
+JOIN chinook.tracks
+ON albums.AlbumId=tracks.AlbumId
+JOIN chinook.genres
+ON tracks.GenreId=genres.GenreId
+WHERE genres.Name = 'Jazz';
